@@ -1,0 +1,52 @@
+import streamlit as st
+import yfinance as yf
+from datetime import datetime
+
+# Streamlit app title
+st.title('Stock Price Web Application')
+
+# Instructions for the user
+st.write("""
+### Enter the stock ticker symbol to see the stock price and performance!
+
+Examples: 
+- Google: **GOOGL**
+- Apple: **AAPL**
+- Tesla: **TSLA**
+""")
+
+
+ticker_symbol = st.text_input('Enter Stock Ticker Symbol', 'AAPL')  # Default is 'AAPL'
+
+
+st.sidebar.header('Select Date Range')
+start_date = st.sidebar.date_input("Start date", datetime(2020, 1, 1))
+end_date = st.sidebar.date_input("End date", datetime.today())
+
+
+if st.button('Get Stock Data'):
+    try:
+        
+        stock_data = yf.Ticker(ticker_symbol)
+        stock_df = stock_data.history(start=start_date, end=end_date)
+        
+      
+        st.write(f"### Showing data for {ticker_symbol} from {start_date} to {end_date}")
+        
+    
+        st.write(stock_data.info['longName'])
+        st.write(stock_data.info['sector'])
+        
+       
+        st.write(stock_df)
+
+       
+        st.line_chart(stock_df['Close'], width=0, height=300)
+
+       
+        st.write(f"### Stock Volume for {ticker_symbol}")
+        st.line_chart(stock_df['Volume'])
+
+    except Exception as e:
+        st.error(f"Failed to retrieve data. Error: {str(e)}")
+
